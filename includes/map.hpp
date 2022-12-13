@@ -14,23 +14,21 @@ namespace ft
     class map
     {
         public:
-            typedef Key                                             key_type;
-            typedef T                                               mapped_type;
-            typedef ft::pair<const Key, T>                          value_type;
-            typedef typename std::size_t                            size_type;
-            typedef typename std::ptrdiff_t                         difference_type;
-            typedef Compare                                         key_compare;
-            typedef Allocator                                       allocator_type;
-            typedef typename allocator_type::reference				            reference;
-            typedef typename allocator_type::const_reference      				const_reference;
-            typedef typename Allocator::pointer                		pointer;
-            typedef typename Allocator::const_pointer          		const_pointer;
-            typedef typename ft::map_iterator<value_type>           iterator;
-            typedef typename ft::map_iterator<const value_type>        const_iterator;
-            typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
-            typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
-
-			typedef typename ft::node<const key_type, mapped_type> node;
+            typedef Key                                             					key_type;
+            typedef T                                               					mapped_type;
+            typedef ft::pair<const Key, T>                 		    					value_type;
+            typedef typename std::size_t                            					size_type;
+            typedef typename std::ptrdiff_t                         					difference_type;
+            typedef Compare                                         					key_compare;
+            typedef Allocator                                       					allocator_type;
+            typedef typename allocator_type::reference				            		reference;
+            typedef typename allocator_type::const_reference      						const_reference;
+            typedef typename Allocator::pointer                							pointer;
+            typedef typename Allocator::const_pointer          							const_pointer;
+            typedef typename ft::map_iterator<value_type, ft::node<value_type> >		iterator;
+            typedef typename ft::map_iterator<const value_type, ft::node<value_type> >	const_iterator;
+            typedef typename ft::reverse_iterator<iterator>         					reverse_iterator;
+            typedef typename ft::reverse_iterator<const_iterator>   					const_reverse_iterator;
 
 			class value_compare : public std::binary_function<value_type, value_type, bool>
 			{
@@ -46,7 +44,10 @@ namespace ft
 			};
 
         private:
-            std::allocator<node >	alloc;
+			typedef typename ft::node<value_type> node;
+			typedef typename std::allocator<node> node_allocator_type;
+
+            node_allocator_type		alloc;
 			allocator_type			_alloc;
 			Compare					comp_key;
 			value_compare			comp_value;
@@ -80,7 +81,7 @@ namespace ft
 				while (x != tend)
 				{
 					y = x;
-					if (n->data.first < x->data.first)
+					if (comp_key(n->data.first, x->data.first))
 						x = x->left;
 					else
 						x = x->right;
@@ -88,7 +89,7 @@ namespace ft
 				n->parent = y;
 				if (y == tend)
 					tree = n;
-				else if (n->data.first < y->data.first)
+				else if (comp_key(n->data.first, y->data.first))
 					y->left = n;
 				else
 					y->right = n;
@@ -100,7 +101,7 @@ namespace ft
 			{
 				if (root == tend || root->data.first == key)
 					return root;
-				else if (key < root->data.first)
+				else if (comp_key(key, root->data.first))
 					return find(key, root->left);
 				else
 					return find(key, root->right);
@@ -126,34 +127,40 @@ namespace ft
 				tend->parent = tend;
 			}
 
-			key_type get_min_key() const
+			node *get_min() const
 			{
 				node *x = tree;
 				while (x->left != tend)
 					x = x->left;
-				return x->data.first;
+				return x;
 			}
+
+			key_type get_min_key() const { return get_min()->data.first; }
 
         public:
  
 			// ----------------- Base -----------------
 
-			explicit map( const Compare& comp = key_compare(), const Allocator& alloc = Allocator()) : alloc(Allocator()), _alloc(alloc),  comp_key(comp), comp_value(value_compare(comp)), tree(create_tree()) {}
+			explicit map( const Compare& comp = key_compare(), const Allocator& alloc = Allocator()) : alloc(node_allocator_type()), _alloc(alloc),  comp_key(comp), comp_value(value_compare(comp)), tree(create_tree()) {}
 
 			template<class InputIt>
-			map(InputIt first, InputIt last, const Compare& comp = key_compare(), const Allocator& alloc = Allocator()) : alloc(Allocator()), _alloc(alloc), comp_key(comp), comp_value(value_compare(comp))
+			map(InputIt first, InputIt last, const Compare& comp = key_compare(), const Allocator& alloc = Allocator()) : alloc(node_allocator_type()), _alloc(alloc), comp_key(comp), comp_value(value_compare(comp))
 			{
 				tree = create_tree();
 				insert(first, last);
 			}
 
-			map(const map& other) : alloc(allocator_type()), _alloc(allocator_type()),  comp_key(key_compare()), comp_value(value_compare(key_compare()))
+			map(const map& other) : alloc(node_allocator_type()), _alloc(allocator_type()),  comp_key(key_compare()), comp_value(value_compare(key_compare()))
 			{ 
 				tree = create_tree();
 				insert(other.begin(), other.end());
 			}
 
-            ~map() {}
+            ~map()
+			{
+				clear();
+				alloc.deallocate(tend, 1);
+			}
 
             map&	operator=(const map& x)
             {
@@ -166,7 +173,7 @@ namespace ft
             	return *this;
             }	
 
-            Allocator get_allocator() const { return alloc; }
+            Allocator get_allocator() const { return _alloc; }
 
 			// ----------------- Element access  -----------------
 			
@@ -188,10 +195,10 @@ namespace ft
 
 			// ----------------- Iterators -----------------
 
-            iterator begin() { return iterator(tree, false, tend); }
-            const_iterator begin() const { return const_iterator(tree, false, tend); }
-            iterator end() { return iterator(tree, true, tend); }
-            const_iterator end() const { return  const_iterator(tree, true, tend); }
+            iterator begin() { return iterator(tree, get_min(), tend); }
+            const_iterator begin() const { return const_iterator(tree, get_min(), tend); }
+            iterator end() { return iterator(tree, tend, tend); }
+            const_iterator end() const { return  const_iterator(tree, tend, tend); }
             reverse_iterator rbegin() { return reverse_iterator(end()); }
             reverse_iterator rend() { return reverse_iterator(begin()); }
 
@@ -259,10 +266,12 @@ namespace ft
 			{
 				while (first != last)
 				{
-					erase(first);
+					iterator save = first;
 					first++;
+					erase(save);
 				}
 			}
+
 			size_type erase(const Key& key)
 			{
 				node *n = find(key, tree);
@@ -275,7 +284,7 @@ namespace ft
 			void swap(map& other)
 			{
             	allocator_type  					tmp_alloc(_alloc);
-				std::allocator<node >  					tmp_nalloc(alloc);
+				node_allocator_type 					tmp_nalloc(alloc);
 				Compare								tmp_ckey(comp_key);
 				value_compare								tmp_cvalue(comp_value);
 				node		*tmp_tree(tree);

@@ -1,12 +1,17 @@
 #include "../includes/vector.hpp"
+#include "../includes/map.hpp"
 #include "../includes/iterator.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
+#include <ctime>
 #include <string>
 
 #define LIB ft
 #define TYPE std::string
-
+#define T1 std::string
+#define T2 int
+/*
 void printv(ft::vector<int> vct)
 {
   std::cout << " /////////////////////////////////// \n";
@@ -29,10 +34,83 @@ void printv(std::vector<int> vct)
     std::cout << vct[i++] << " ------- \n";
   }
   std::cout << " /////////////////////////////////// \n";
+}*/
+
+/*void printm(ft::map<T1, T2> m)
+{
+  std::cout << " /////////////////////////////////// \n";
+  //std::cout << m.size() << " ------- \n\n";
+  ft::map<T1, T2>::iterator it = m.begin();
+  //ite = m.end();
+  while (it != m.end())
+  {
+    std::cout << " - " << it->first << " - " << it->second << std::endl;
+    it++;
+  }
+  std::cout << " /////////////////////////////////// \n";
 }
+
+void printm(std::map<T1, T2> m)
+{
+  std::cout << " /////////////////////////////////// \n";
+  //std::cout << m.size() << " ------- \n\n";
+  std::map<T1, T2>::iterator it = m.begin();
+  //ite = m.end();
+  while (it != m.end())
+  {
+    std::cout << " - " << it->first << " - " << it->second << std::endl;
+    it++;
+  }
+  std::cout << " /////////////////////////////////// \n";
+}*/
 
 int main() 
 {
+
+    ft::map<T1, T2> list;
+    std::map<T1, T2> list2;
+
+    list2.insert(std::make_pair("COUCOU", 42));
+    list2.insert(std::make_pair("COCO", 500));
+    list2.insert(std::make_pair("x", 85));
+
+    list.insert(ft::make_pair("COUCOU", 42));
+    //list.insert(ft::make_pair("COCO", 500));
+    //list.insert(ft::make_pair("x", 85));
+
+    std::cout << " FT : - " << list.max_size() << " - \n";
+    std::cout << " ST : - " << list2.max_size() << " - \n";
+    /*std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    std::map<T1, T2> list;
+
+    list.insert(std::make_pair("COUCOU", 42));
+    list.insert(std::make_pair("COCO", 500));
+    list.insert(std::make_pair("x", 85));
+
+    list.erase(++list.begin());
+
+    printm(list);
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+ 
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+ 
+    std::cout << "finished computation at " << std::ctime(&end_time)
+              << "elapsed time: " << elapsed_seconds.count() << "s"
+              << std::endl;*/
+  /*std::map<T1, T2> list2;
+
+  list2.insert(std::make_pair("COUCOU", 42));
+  list2.insert(std::make_pair("COCO", 500));
+  list2.insert(std::make_pair("x", 85));
+
+  std::cout << " FT : - " << list.max_size() << " - \n";
+  std::cout << " ST : - " << list2.max_size() << " - \n";*/
+
+  //printm(list);
+
   /*
   ft::vector<int> toto = ft::vector<int>();
   std::vector<int> tata = std::vector<int>();
@@ -106,11 +184,11 @@ int main()
 
 	std::cout << *vct.erase(vct.begin(), vct.end()) << " ------- \n";
   printv(vct);*/
-  ft::vector<int> vct(5);
-  ft::vector<int>::reverse_iterator it = vct.rbegin();
+  //ft::vector<int> vct(5);
+  //ft::vector<int>::reverse_iterator it = vct.rbegin();
 	//std::vector<int>::const_reverse_iterator ite = vct.rbegin();
 
-
+/*
   printv(vct);
 
 	for (int i = 0; i < 5; ++i)
@@ -122,6 +200,6 @@ int main()
 	it = 1 + it;
 	it = it - 4;
 	std::cout << *(it += 2) << std::endl;
-	std::cout << *(it -= 1) << std::endl;
+	std::cout << *(it -= 1) << std::endl;*/
 
 }

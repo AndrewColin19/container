@@ -30,6 +30,7 @@ int		main(void)
 	is_empty(mp2);
 
 	it = mp.begin();
+
 	for (unsigned long int i = 3; i < mp.size(); ++i)
 		it++->second = i * 7;
 

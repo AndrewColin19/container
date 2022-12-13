@@ -90,3 +90,30 @@ Content is:
 - key: 50 | value: mdr
 - key: 55 | value: fuzzy
 ###############################################
+	-- [8] --
+insert return: key: 1337 | value: beauty
+size: 1
+max_size: 329406144173384850
+
+Content is:
+- key: 1337 | value: beauty
+###############################################
+	-- [9] --
+insert return: key: 1000 | value: Hello
+size: 2
+max_size: 329406144173384850
+
+Content is:
+- key: 1000 | value: Hello
+- key: 1337 | value: beauty
+###############################################
+	-- [10] --
+insert return: key: 1500 | value: World
+size: 3
+max_size: 329406144173384850
+
+Content is:
+- key: 1000 | value: Hello
+- key: 1337 | value: beauty
+- key: 1500 | value: World
+###############################################

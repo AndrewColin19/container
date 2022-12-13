@@ -137,19 +137,19 @@ namespace ft
 
     template <class T1, class T2> 
 	bool operator<( const ft::pair<T1, T2>& lhs, const ft::pair<T1, T2>& rhs )
-    { return lhs.first < rhs.first && lhs.second < rhs.second; }
+    { return lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second); }
 
     template <class T1, class T2> 
 	bool operator<=( const ft::pair<T1, T2>& lhs, const ft::pair<T1, T2>& rhs )
-    { return lhs < rhs || lhs == rhs; }
+    { return !(rhs < lhs); }
 
     template <class T1, class T2> 
 	bool operator>( const ft::pair<T1, T2>& lhs, const ft::pair<T1, T2>& rhs )
-    { return lhs.first > rhs.first && lhs.second > rhs.second; }
+    { return rhs < lhs; }
 
     template <class T1, class T2> 
 	bool operator>=( const ft::pair<T1, T2>& lhs, const ft::pair<T1, T2>& rhs )
-    { return lhs > rhs || lhs == rhs; }
+    { return !(lhs < rhs); }
 
     template<class T1, class T2>
     ft::pair<T1,T2> make_pair(T1 t, T2 u)
@@ -157,14 +157,14 @@ namespace ft
         return ft::pair<T1, T2>(t, u);
     }
 
-    template<class Key, class Value>
+    template<class Pair>
     struct node
     {
-        ft::pair<Key, Value>    data;
+        Pair                    data;
         node                    *parent;
         node					*left;
         node    				*right;
 
-		node(ft::pair<Key, Value> d) : data(d), parent(NULL), left(NULL), right(NULL) {}
+		node(const Pair &d) : data(d), parent(NULL), left(NULL), right(NULL) {}
     };
 }

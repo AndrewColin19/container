@@ -178,46 +178,45 @@ namespace ft
         return x.base() < x2.base();
     }
 
-    template <class T>
+    template <class T, class N>
     class map_iterator : public iterator<bidirectional_iterator_tag, T>
     {
         public:
-            typedef typename iterator<bidirectional_iterator_tag, T>::value_type         value_type;
-            typedef typename iterator<bidirectional_iterator_tag, T>::difference_type  difference_type;
-            typedef typename iterator<bidirectional_iterator_tag, T>::pointer   pointer;
-            typedef typename iterator<bidirectional_iterator_tag, T>::reference reference;
-            typedef typename iterator<bidirectional_iterator_tag, T>::iterator_category  iterator_category;
-            typedef typename T::first_type    key_type;
-            typedef typename T::second_type mapped_type;
-            typedef typename ft::node<key_type, mapped_type>      *ite_node;
-        
-        protected:
-            ite_node root;
-            ite_node cur;
-            ite_node tend;
+            typedef typename iterator<bidirectional_iterator_tag, T>::value_type		value_type;
+            typedef typename iterator<bidirectional_iterator_tag, T>::difference_type	difference_type;
+            typedef typename iterator<bidirectional_iterator_tag, T>::pointer			pointer;
+            typedef typename iterator<bidirectional_iterator_tag, T>::reference			reference;
+            typedef typename iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
         
         private:
-            ite_node    get_max(ite_node x)
+
+            N *root;
+            N *cur;
+            N *tend;
+
+            N *get_max(N *x)
             {
                 while (x->right != tend)
                     x = x->right;
                 return x;
             }
 
-            ite_node    get_min(ite_node x)
+            N *get_min(N *x)
             {
-                while (x->left != tend)
+                while (x->left != this->tend)
+                {
                     x = x->left;
+                }
                 return x;
             }
     
-            ite_node    get_previous(ite_node x)
+            N *get_previous(N *x)
             {
                 if (x == tend)
                     return get_max(root);
                 if ((x->left) != tend)
                     return get_max(x->left);
-                ite_node start = x->parent;
+                N *start = x->parent;
                 while (start != tend && x == start->left)
                 {
                     x = start;
@@ -226,11 +225,13 @@ namespace ft
                 return start;
             }
 
-            ite_node    get_next(ite_node x)
+            N *get_next(N *x)
             {
+                if (x == tend)
+                    return tend;
                 if ((x->right) != tend)
                     return get_min(x->right);
-                ite_node start = x->parent;
+                N *start = x->parent;
                 while (start != tend && x == start->right)
                 {
                     x = start;
@@ -240,10 +241,9 @@ namespace ft
             }
 
         public:
-            map_iterator(const map_iterator& x) : root(x.root), cur(x.cur), tend(x.tend) {}
-            map_iterator(ite_node root, bool end, ite_node tend) : root(root), tend(tend) { cur = end ? tend : get_min(root); }
-            map_iterator(ite_node root, ite_node cur, ite_node tend) : root(root), cur(cur), tend(tend) {}
             map_iterator() : root(NULL), cur(NULL), tend(NULL) {}
+            map_iterator(const map_iterator& x) : root(x.root), cur(x.cur), tend(x.tend) {}
+            map_iterator(N *root, N *cur, N *tend) : root(root), cur(cur), tend(tend) {}
             ~map_iterator() {}
 
             pointer   operator->() const { return &(cur->data); }
@@ -254,6 +254,7 @@ namespace ft
             {
                 root = x.root;
                 cur = x.cur;
+                tend = x.tend;
                 return *this;
             }
 
@@ -302,17 +303,17 @@ namespace ft
                 return &cur->data;
             }
 
-            operator map_iterator<const T>() const { return map_iterator<const T>(root, cur, tend); }
+            operator map_iterator<const T, N>() const { return map_iterator<const T, N>(root, cur, tend); }
     };
 
-    template<class T, class T2>
-    bool operator==(const map_iterator<T> &x, const map_iterator<T2> &x2)
+    template<class T, class Node>
+    bool operator==(const map_iterator<T, Node> &x, const map_iterator<T, Node> &x2)
     {
         return x.base() == x2.base();
     }
 
-    template<class T, class T2>
-    bool operator!=(const map_iterator<T> &x, const map_iterator<T2> &x2)
+    template<class T, class Node>
+    bool operator!=(const map_iterator<T, Node> &x, const map_iterator<T, Node> &x2)
     {
         return x.base() != x2.base();
     }
